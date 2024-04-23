@@ -1,0 +1,38 @@
+<!-- friends.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Your Friends</h1>
+
+<!-- Search form -->
+<form method="get" action="{% url 'friends' %}">
+    {{ form.as_p }}
+    <button type="submit" name="search">Search</button>
+</form>
+
+<!-- Search results -->
+{% if search_results %}
+    <h2>Search Results</h2>
+    <ul>
+        {% for user in search_results %}
+            <li>
+                {{ user.email }}
+                <form method="post" action="{% url 'friends' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="add_friend" value="{{ user.id }}">Add Friend</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<!-- Listing current friends -->
+<h2>Your Friends:</h2>
+<ul>
+    {% for friend in friends %}
+        <li>{{ friend.email }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,9 +1,8 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from .forms import *
 from .models import *
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
 
@@ -36,31 +35,6 @@ def logout_view(request):
     logout(request)
     return redirect('accounts:login') 
 
-def home_view(request):
-    photos = Photo.objects.all().order_by('-id')
-    form = CommentForm(user=request.user if request.user.is_authenticated else None)
-
-    if request.method == 'POST':
-        if 'like_photo_id' in request.POST:
-            photo_id = request.POST.get('like_photo_id')
-            photo = get_object_or_404(Photo, id=photo_id)
-            if request.user.is_authenticated:
-                like, created = Like.objects.get_or_create(user=request.user, photo=photo)
-            else:
-                session_key = request.session.session_key or request.session.create()
-                like, created = Like.objects.get_or_create(session_key=session_key, photo=photo)
-            if not created:  # If the like already existed, remove it
-                like.delete()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-        elif 'comment_photo_id' in request.POST:
-            form = CommentForm(request.POST, user=request.user if request.user.is_authenticated else None)
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.photo = get_object_or_404(Photo, pk=request.POST.get('photo_id'))
-                comment.save()
-                return redirect('home')  # Refresh the page to clear the form and show the new comment
-
-    return render(request, 'home.html', {'photos': photos, 'form': form})
 
 @login_required
 def profile_view(request):
@@ -90,3 +64,4 @@ def delete_album(request, album_id):
         album.delete()
         return redirect('accounts:profile')  # Redirect to the profile page or wherever appropriate
     return redirect('accounts:album_detail', album_id=album_id)
+

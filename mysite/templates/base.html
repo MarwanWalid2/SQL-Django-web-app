@@ -12,10 +12,13 @@
     
     <nav>
         <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'accounts:login' %}">Login</a></li>
             <li><a href="{% url 'accounts:register' %}">Register</a></li>
             <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
             <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+            <li><a href="{% url 'friends' %}">Friends</a></li>
+
 
         </ul>
     </nav>

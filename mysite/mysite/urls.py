@@ -20,12 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts.views import *
 from django.conf.urls.static import static
-
+from .views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('', home_view, name='home'),
+    path('friends/', friends_view, name='friends'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
