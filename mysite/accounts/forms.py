@@ -26,3 +26,25 @@ class CommentForm(forms.ModelForm):
         if commit:
             comment.save()
         return comment
+
+class AlbumForm(forms.ModelForm):
+    class Meta:
+        model = Album
+        fields = ['name']  # Add more fields if necessary
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        album = super().save(commit=False)
+        if not self.instance.pk:  # If no instance, it's a new album
+            album.owner = self.user
+        if commit:
+            album.save()
+        return album
+    
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['album', 'caption', 'data']

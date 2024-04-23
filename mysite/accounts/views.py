@@ -4,6 +4,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from .forms import *
 from .models import *
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -60,19 +62,31 @@ def home_view(request):
 
     return render(request, 'home.html', {'photos': photos, 'form': form})
 
-# def like_photo(request, photo_id):
-#     photo = Photo.objects.get(id=photo_id)
-#     like, created = Like.objects.get_or_create(user=request.user, photo=photo)
-#     if not created:  # If the like already existed, remove it
-#         like.delete()
-#     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+@login_required
+def profile_view(request):
+    albums = Album.objects.filter(owner=request.user).prefetch_related('photos')
+    form = AlbumForm(user=request.user)
+    photo_form = PhotoForm()  # Initialize the photo form
+    photo_form.fields['album'].queryset = albums  # Limit album choices to user's own albums
 
-# def like_photo(request, photo_id):
-#     photo =  Photo.objects.get(Photo, id=photo_id)
-#     if request.user.is_authenticated:
-#         like, created = Like.objects.get_or_create(user=request.user, photo=photo)
-#     else:
-#         like, created = Like.objects.get_or_create(None, photo=photo)
-#     if not created:  # If the like already existed, remove it
-#         like.delete()
-#     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    if request.method == 'POST':
+        if 'create_album' in request.POST:
+            form = AlbumForm(request.POST, user=request.user)
+            if form.is_valid():
+                form.save()
+                return redirect('accounts:profile')
+        elif 'upload_photo' in request.POST:
+            photo_form = PhotoForm(request.POST, request.FILES)
+            if photo_form.is_valid():
+                photo_form.save()
+                return redirect('accounts:profile')
+
+    return render(request, 'accounts/profile.html', {'form': form, 'photo_form': photo_form, 'albums': albums})
+
+@login_required
+def delete_album(request, album_id):
+    album = get_object_or_404(Album, id=album_id, owner=request.user)  # Ensure the user owns the album
+    if request.method == 'POST':
+        album.delete()
+        return redirect('accounts:profile')  # Redirect to the profile page or wherever appropriate
+    return redirect('accounts:album_detail', album_id=album_id)

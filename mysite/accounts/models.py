@@ -40,7 +40,7 @@ class Album(models.Model):
 class Photo(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='photos')
     caption = models.CharField(max_length=255)
-    data = models.CharField(max_length=255)  # Assuming this stores a path or URL to the photo
+    data = models.ImageField(upload_to='photos/')  # Assuming this stores a path or URL to the photo
 
     def __str__(self):
         return self.caption
