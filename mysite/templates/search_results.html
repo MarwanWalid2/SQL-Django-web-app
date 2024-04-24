@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Search Photos by Tags</h2>
+<form method="get" action="{% url 'search_results' %}">
+    <input type="text" name="tags" placeholder="Enter tags separated by spaces">
+    <button type="submit">Search</button>
+</form>
+
+
+<ul>
+    {% for tag in tags %}
+    <li><a href="{% url 'view_photos_by_tag' tag.name %}">{{ tag.name }} </a></li>
+        {% empty %}
+        <p>No tags to display based on your search.</p>
+    {% endfor %}
+</ul>
+
+
+
+{% endblock %}

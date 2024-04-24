@@ -12,6 +12,8 @@ from django.db.models import Q
 def home_view(request):
     albums = Album.objects.all().prefetch_related('photos') 
     form = CommentForm(user=request.user if request.user.is_authenticated else None)
+    searchform = TagSearchForm(request.GET or None)
+    tags = Tag.objects.annotate(photo_count=models.Count('photos')).order_by('-photo_count')[:10]
 
     if request.method == 'POST':
         if 'like_photo_id' in request.POST:
@@ -33,7 +35,12 @@ def home_view(request):
                 comment.save()
                 return redirect('home')  # Refresh the page to clear the form and show the new comment
 
-    return render(request, 'home.html', {'albums': albums, 'form': form})
+    return render(request, 'home.html', {
+        'albums': albums,
+        'form': form,
+        'searchform': searchform,
+        'tags': tags
+    })
 
 
 User = get_user_model()
@@ -70,3 +77,33 @@ def friends_view(request):
         'search_results': search_results,
         'friends': friends
     })
+
+
+def search_photos_by_tags(request):
+    tags = []
+    if request.method == 'GET' and 'tags' in request.GET:
+        tag_names = request.GET['tags'].split()
+        tags = Tag.objects.filter(name__in=tag_names)
+    return render(request, 'search_results.html', {'tags': tags})
+
+
+
+def view_photos_by_tag(request, tag_name):
+    tag = Tag.objects.get(name=tag_name)
+    view_all = 'view_all' in request.GET
+    view_mine = 'view_mine' in request.GET
+    error_message = None
+
+    if view_all:
+        photos = tag.photos.all()
+    elif view_mine:
+        #check if the user is registered if so then show only their photos
+        if request.user.is_authenticated:
+            photos = tag.photos.filter(album__owner=request.user)
+        else:
+            error_message = "You need to be registered to view your photos"
+            photos = tag.photos.none()
+    else:
+        photos = tag.photos.all()
+
+    return render(request, 'photos_by_tag.html', {'photos': photos, 'tag_name': tag_name, 'error_message': error_message})

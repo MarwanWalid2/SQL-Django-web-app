@@ -48,21 +48,22 @@ class Album(models.Model):
     def __str__(self):
         return f"{self.name} owned by {self.owner}"
     
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Photo(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='photos')
     caption = models.CharField(max_length=255)
     data = models.ImageField(upload_to='photos/')  # Assuming this stores a path or URL to the photo
+    tags = models.ManyToManyField(Tag, related_name='photos')
 
     def __str__(self):
         return self.caption
-    
-    def delete(self, *args, **kwargs):
-        print("Deleting photo:", self.data.path)
-        # Delete the file from the filesystem
-        if self.data:
-            if os.path.isfile(self.data.path):
-                os.remove(self.data.path)
-        super(Photo, self).delete(*args, **kwargs)
     
 class Comment(models.Model):
     text = models.CharField(max_length=255) 

@@ -52,7 +52,19 @@ def profile_view(request):
         elif 'upload_photo' in request.POST:
             photo_form = PhotoForm(request.POST, request.FILES)
             if photo_form.is_valid():
-                photo_form.save()
+                photo = photo_form.save(commit=False)
+                photo.album_id = request.POST.get('album') 
+                photo.save()  # Save the photo to generate an ID
+
+                # Handle tags
+                tag_list = request.POST.get('tags', '').split(',')
+                for tag_name in tag_list:
+                    tag_name = tag_name.strip()
+                    if tag_name:  # Ensure tag is not empty
+                        tag, created = Tag.objects.get_or_create(name=tag_name)
+                        photo.tags.add(tag)
+
+                photo.save()  # Save the photo again to link tags
                 return redirect('accounts:profile')
 
     return render(request, 'accounts/profile.html', {'form': form, 'photo_form': photo_form, 'albums': albums})
@@ -64,4 +76,3 @@ def delete_album(request, album_id):
         album.delete()
         return redirect('accounts:profile')  # Redirect to the profile page or wherever appropriate
     return redirect('accounts:album_detail', album_id=album_id)
-

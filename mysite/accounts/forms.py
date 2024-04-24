@@ -10,7 +10,9 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 
-    
+class TagSearchForm(forms.Form):
+    tags = forms.CharField(label='Search by Tags', max_length=100)
+
 class UserSearchForm(forms.Form):
     search_query = forms.CharField(label='Search Users', max_length=100, required=False)
 
@@ -55,6 +57,12 @@ class AlbumForm(forms.ModelForm):
         return album
     
 class PhotoForm(forms.ModelForm):
+    tags = forms.CharField(max_length=255, required=False, help_text="Enter comma-separated tags.")
+
     class Meta:
         model = Photo
-        fields = ['album', 'caption', 'data']
+        fields = ['album', 'caption', 'data']  
+
+    def __init__(self, *args, **kwargs):
+        super(PhotoForm, self).__init__(*args, **kwargs)
+        self.fields['album'].widget = forms.HiddenInput()

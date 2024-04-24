@@ -27,6 +27,9 @@ urlpatterns = [
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('', home_view, name='home'),
     path('friends/', friends_view, name='friends'),
+    path('search_results/', search_photos_by_tags, name='search_results'),
+    path('photos/<str:tag_name>/', view_photos_by_tag, name='view_photos_by_tag'),
+    path('photos/<str:tag_name>/all/', lambda request, tag_name: view_photos_by_tag(request, tag_name, True), name='view_all_photos_by_tag'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
