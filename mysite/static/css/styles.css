@@ -1,25 +1,26 @@
+/* styles.css for Dark Mode */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background: #f4f4f4;
-    color: #333;
+    background: #121212;  /* Dark background for the body */
+    color: #fff;  /* Lighter text for better readability */
 }
 
 header, nav, main, footer {
     padding: 20px;
     margin: 10px;
-    background: white;
-    border: 1px solid #ccc;
+    background: #1e1e1e;  /* Darker panels */
+    border: 1px solid #333;
 }
 
 h1, h2, h3 {
-    color: #333;
+    color: #fff;  /* White text for headers */
 }
 
 a {
-    color: #0066cc;
+    color: #F2613F;  /* A light purple color for links */
     text-decoration: none;
 }
 
@@ -42,10 +43,13 @@ input[type=text], input[type=file] {
     margin-top: 5px;
     margin-bottom: 10px;
     box-sizing: border-box;
+    background: #333;
+    color: #fff;  /* Light text on dark input backgrounds */
+    border: 1px solid #555;
 }
 
 button {
-    background-color: #5cb85c;
+    background-color: #9B3922;  /* A deep purple for buttons */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -53,7 +57,7 @@ button {
 }
 
 button:hover {
-    background-color: #4cae4c;
+    background-color: #F2613F;
 }
 
 form {
@@ -63,6 +67,48 @@ form {
 footer {
     text-align: center;
     padding: 10px 0;
+    color: #aaa;  /* Light gray for footer text */
+}
+
+
+
+.navbar {
+    background-color: #333;
+    overflow: hidden;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.navbar-logo {
+    color: #fff;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.navbar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.navbar-menu li {
+    padding: 14px 20px;
+}
+
+.navbar-menu a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.navbar-menu a:hover {
+    color: #F2613F;
 }
 
 
@@ -75,7 +121,7 @@ footer {
 .photo-item {
     width: calc(33.333% - 20px);  /* three items per row, with margin */
     margin: 10px;
-    background: #fff;
+    background: #F2613F;
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }

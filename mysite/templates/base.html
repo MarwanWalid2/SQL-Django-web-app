@@ -1,3 +1,4 @@
+<!-- base.html -->
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,24 +7,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <title>{% block title %}My Site{% endblock %}</title>
+    <title>{% block title %}PhotoDump{% endblock %}</title>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Site</h1>
-    </header>
     
-    <nav>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'accounts:login' %}">Login</a></li>
-            <li><a href="{% url 'accounts:register' %}">Register</a></li>
-            <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
-            <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
-            <li><a href="{% url 'friends' %}">Friends</a></li>
-
-
-        </ul>
+    
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{% url 'home' %}" class="navbar-logo"><header>
+                <h1>PhotoDump</h1>
+            </header></a>
+            <ul class="navbar-menu">
+                <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                <li><a href="{% url 'accounts:register' %}">Register</a></li>
+                <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+                <li><a href="{% url 'friends' %}">Friends</a></li>
+            </ul>
+        </div>
     </nav>
 
     <main>
