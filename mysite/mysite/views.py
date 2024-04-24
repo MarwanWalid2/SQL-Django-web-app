@@ -89,6 +89,7 @@ def search_photos_by_tags(request):
 
 
 def view_photos_by_tag(request, tag_name):
+    form = CommentForm(user=request.user if request.user.is_authenticated else None)
     tag = Tag.objects.get(name=tag_name)
     view_all = 'view_all' in request.GET
     view_mine = 'view_mine' in request.GET
@@ -105,5 +106,5 @@ def view_photos_by_tag(request, tag_name):
             photos = tag.photos.none()
     else:
         photos = tag.photos.all()
-
-    return render(request, 'photos_by_tag.html', {'photos': photos, 'tag_name': tag_name, 'error_message': error_message})
+        
+    return render(request, 'photos_by_tag.html', {'photos': photos, 'tag_name': tag_name, 'error_message': error_message, 'form': form,})

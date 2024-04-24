@@ -21,7 +21,7 @@ class UserSearchForm(forms.Form):
         return data
     
 class CommentForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea, required=True)
+    text = forms.CharField(widget=forms.Textarea, required=True, label='Comment:')
     class Meta:
         model = Comment
         fields = ['text']

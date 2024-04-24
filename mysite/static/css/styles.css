@@ -1,0 +1,99 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    color: #333;
+}
+
+header, nav, main, footer {
+    padding: 20px;
+    margin: 10px;
+    background: white;
+    border: 1px solid #ccc;
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+input[type=text], input[type=file] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+form {
+    margin-top: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px 0;
+}
+
+
+.photo-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.photo-item {
+    width: calc(33.333% - 20px);  /* three items per row, with margin */
+    margin: 10px;
+    background: #fff;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.photo-item img {
+    width: 100%;
+    height: auto;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .photo-item {
+        width: calc(50% - 20px); /
+    }
+}
+
+@media (max-width: 480px) {
+    .photo-item {
+        width: 100%;
+    }
+}
