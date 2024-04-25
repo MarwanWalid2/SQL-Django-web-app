@@ -2,14 +2,16 @@
 
 {% block content %}
 
-<h1>Shared Albums</h1>
-
-<form method="get" action="{% url 'search_results' %}">
-    <input type="text" name="tags" placeholder="Enter tags separated by spaces">
-    <button type="submit">Search</button>
-</form>
 
 
+
+
+<h2>Top Contributors</h2>
+<ul>
+    {% for user in top_contributors %}
+    <li>{{ user.first_name }} {{ user.last_name }}- Photos uploaded: {{ user.photo_count }}, Comments made: {{ user.comment_count }}, Total Score: {{ user.contribution_score }}</li>
+    {% endfor %}
+</ul>
 
 
 <h2>Popular Tags</h2>
@@ -18,6 +20,15 @@
     <li><a href="{% url 'view_photos_by_tag' tag.name %}">{{ tag.name }}</a> ({{ tag.photo_count }})</li>
     {% endfor %}
 </ul>
+
+
+<h1>Shared Albums</h1>
+
+<form method="get" action="{% url 'search_results' %}">
+    <input type="text" name="tags" placeholder="Enter tags separated by spaces">
+    <button type="submit">Search</button>
+</form>
+
 
 {% for album in albums %}
     <div class="album">

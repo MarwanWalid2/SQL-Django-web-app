@@ -5,7 +5,8 @@ from accounts.forms import *
 from accounts.models import *
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Count, F, Q
+from django.contrib.auth.models import User
 
 
 
@@ -14,6 +15,14 @@ def home_view(request):
     form = CommentForm(user=request.user if request.user.is_authenticated else None)
     searchform = TagSearchForm(request.GET or None)
     tags = Tag.objects.annotate(photo_count=models.Count('photos')).order_by('-photo_count')[:10]
+    users_with_photos = User.objects.annotate(photo_count=Count('albums__photos'))
+    top_contributors = users_with_photos.annotate(
+        comment_count=Count(
+            'comments', 
+            filter=Q(comments__photo__album__owner__id=F('id')) & ~Q(comments__photo__album__owner=F('id'))
+        ),
+        contribution_score=F('photo_count') + F('comment_count')
+    ).order_by('-contribution_score')[:10]
 
     if request.method == 'POST':
         if 'like_photo_id' in request.POST:
@@ -42,7 +51,8 @@ def home_view(request):
         'albums': albums,
         'form': form,
         'searchform': searchform,
-        'tags': tags
+        'tags': tags,
+        'top_contributors': top_contributors
     })
 
 
@@ -111,3 +121,4 @@ def view_photos_by_tag(request, tag_name):
         photos = tag.photos.all()
         
     return render(request, 'photos_by_tag.html', {'photos': photos, 'tag_name': tag_name, 'error_message': error_message, 'form': form,})
+
