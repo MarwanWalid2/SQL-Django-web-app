@@ -17,13 +17,22 @@
             <a href="{% url 'home' %}" class="navbar-logo"><header>
                 <h1>PhotoDump</h1>
             </header></a>
-            <ul class="navbar-menu">
-                <li><a href="{% url 'accounts:login' %}">Login</a></li>
-                <li><a href="{% url 'accounts:register' %}">Register</a></li>
-                <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
-                <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
-                <li><a href="{% url 'friends' %}">Friends</a></li>
-            </ul>
+            <nav class="navbar">
+                <div class="navbar-container">
+                    <ul class="navbar-menu">
+                        {% if not user.is_authenticated %}
+                            <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                            <li><a href="{% url 'accounts:register' %}">Register</a></li>
+                        {% else %}
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                            <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li><a href="{% url 'friends' %}">Friends</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+            
         </div>
     </nav>
 
