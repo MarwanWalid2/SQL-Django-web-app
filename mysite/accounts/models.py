@@ -80,7 +80,7 @@ class Like(models.Model):
     session_key = models.CharField(max_length=40, null=True, blank=True)  # Optional field for guests
 
     class Meta:
-        unique_together = (('user', 'photo'), ('session_key', 'photo'))
+        unique_together = (('user', 'photo'), ('session_key', 'photo'),)
 
     def __str__(self):
         return f"Like by {self.user.first_name if self.user else 'Guest'} {self.user.last_name if self.user else ''}"

@@ -22,9 +22,12 @@ def home_view(request):
             if request.user.is_authenticated:
                 like, created = Like.objects.get_or_create(user=request.user, photo=photo)
             else:
-                session_key = request.session.session_key or request.session.create()
+                if not request.session.session_key:
+                    request.session.save() 
+                session_key = request.session.session_key
+                print(session_key)
                 like, created = Like.objects.get_or_create(session_key=session_key, photo=photo)
-            if not created:  # If the like already existed, remove it
+            if not created:
                 like.delete()
             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
         elif 'comment_photo_id' in request.POST:
