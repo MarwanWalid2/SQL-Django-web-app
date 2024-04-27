@@ -15,15 +15,15 @@ def home_view(request):
     form = CommentForm(user=request.user if request.user.is_authenticated else None)
     searchform = TagSearchForm(request.GET or None)
     tags = Tag.objects.annotate(photo_count=models.Count('photos')).order_by('-photo_count')[:10]
-    users_with_photos = User.objects.annotate(photo_count=Count('albums__photos'))
+    users_with_photos = User.objects.annotate(photo_count=Count('albums__photos', distinct=True))
     top_contributors = users_with_photos.annotate(
         comment_count=Count(
             'comments', 
-            filter=Q(comments__photo__album__owner__id=F('id')) & ~Q(comments__photo__album__owner=F('id'))
+            filter=~Q(comments__photo__album__owner=F('id')),
+            distinct=True
         ),
         contribution_score=F('photo_count') + F('comment_count')
     ).order_by('-contribution_score')[:10]
-
     if request.method == 'POST':
         if 'like_photo_id' in request.POST:
             photo_id = request.POST.get('like_photo_id')
@@ -102,8 +102,6 @@ def friends_view(request):
     search_results = []
     friends = set()
     recommendations = get_friend_recommendations(request.user)
-    # print(recommendations)
-    # Get the current user's friends
     friends_relations = Friend.objects.filter(Q(user1=request.user) | Q(user2=request.user))
     friend_ids = {relation.user2.id if relation.user1 == request.user else relation.user1.id for relation in friends_relations}
     for relation in friends_relations:
@@ -113,8 +111,8 @@ def friends_view(request):
         search_query = form.cleaned_data['search_query']
         search_results = User.objects.filter(
             Q(email__icontains=search_query) & 
-            ~Q(id__in=friend_ids) &  # Exclude current friends
-            ~Q(id=request.user.id)  # Exclude the current user themselves
+            ~Q(id__in=friend_ids) &  
+            ~Q(id=request.user.id) 
         )
 
     if 'add_friend' in request.POST:
@@ -150,7 +148,6 @@ def view_photos_by_tag(request, tag_name):
     if view_all:
         photos = tag.photos.all()
     elif view_mine:
-        #check if the user is registered if so then show only their photos
         if request.user.is_authenticated:
             photos = tag.photos.filter(album__owner=request.user)
         else:
@@ -161,3 +158,39 @@ def view_photos_by_tag(request, tag_name):
         
     return render(request, 'photos_by_tag.html', {'photos': photos, 'tag_name': tag_name, 'error_message': error_message, 'form': form,})
 
+
+@login_required
+def recommend_photos(request):
+    form = CommentForm(user=request.user if request.user.is_authenticated else None)
+    user = request.user
+    top_tags = Tag.objects.filter(
+        photos__album__owner=user
+    ).annotate(
+        num_tags=Count('photos')
+    ).order_by('-num_tags')[:5]
+
+    top_tag_list = [tag.name for tag in top_tags]
+
+    candidate_photos = Photo.objects.exclude(album__owner=user).annotate(
+        matches=Count('tags', filter=Q(tags__name__in=top_tag_list)),
+        total_tags=Count('tags')
+    ).order_by('-matches', 'total_tags')
+
+    return render(request, 'recs.html', {'photos': candidate_photos,'form': form})
+
+
+def search_comments(request):
+    query = request.GET.get('query', '')
+    if query:
+        matching_comments = Comment.objects.filter(text__exact=query)
+        user_comment_counts = matching_comments.values('user__email', 'user__first_name', 'user__last_name').annotate(count=Count('id')).order_by('-count')
+        users = User.objects.filter(email__in=[item['user__email'] for item in user_comment_counts])
+    else:
+        user_comment_counts = []
+        users = []
+
+    return render(request, 'comment_results.html', {
+        'user_comment_counts': user_comment_counts,
+        'query': query,
+        'users': users
+    })

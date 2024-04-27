@@ -26,9 +26,13 @@
 
 <form method="get" action="{% url 'search_results' %}">
     <input type="text" name="tags" placeholder="Enter tags separated by spaces">
-    <button type="submit">Search</button>
+    <button type="submit">Search by tags</button>
 </form>
 
+<form method="get" action="{% url 'comment_search' %}">
+    <input type="text" name="query" placeholder="Search comments...">
+    <button type="submit">Search comments</button>
+</form>
 
 {% for album in albums %}
     <div class="album">

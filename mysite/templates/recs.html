@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>You May Also Like</h1>
+{% for photo in photos %}
+<div class="photo-item">
+    <img src="{{ photo.data.url }}" alt="{{ photo.caption }}">
+    <p>Uploaded by {{ photo.album.owner.first_name }} {{ photo.album.owner.last_name }} on {{ photo.album.date_created }}</p>
+    <p>Caption: {{ photo.caption }}</p>
+    <p>{{ photo.likes.count }} Likes</p>
+        <form action="{% url 'home' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="like_photo_id" value="{{ photo.id }}">
+            <button type="submit">Like</button>
+        </form>
+        <ul>
+            {% for like in photo.likes.all %}
+            <li>{{ like }}</li>
+            {% endfor %}
+        </ul>
+        
+        <form action="{% url 'home' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="photo_id" value="{{ photo.id }}">
+            <input type="hidden" name="comment_photo_id" value="{{ comment.id }}">  
+            {{ form.as_p }}
+            <button type="submit">Post Comment</button>
+        </form>
+    
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h2>Comments</h2>
+            {% for comment in photo.comments.all %}
+            <p>{{ comment }}</p> 
+            {% endfor %}
+        </div>
+</div>
+{% empty %}
+<p>No photos to display based on your search.</p>
+{% endfor %}
+</div>
+{% endblock %}

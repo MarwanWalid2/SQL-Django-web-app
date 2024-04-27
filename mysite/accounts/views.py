@@ -77,4 +77,3 @@ def delete_album(request, album_id):
         return redirect('accounts:profile')  
     return redirect('accounts:album_detail', album_id=album_id)
 
-
