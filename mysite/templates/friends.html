@@ -35,4 +35,17 @@
     {% endfor %}
 </ul>
 
+<h2>Friend Recommendations</h2>
+<ul>
+    {% for user in recommendations %}
+    <li>
+        {{ user.email }}
+        <form method="post" action="{% url 'friends' %}">
+            {% csrf_token %}
+            <button type="submit" name="add_friend" value="{{ user.id }}">Add Friend</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
 {% endblock %}

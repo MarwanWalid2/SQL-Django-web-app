@@ -40,8 +40,8 @@ def logout_view(request):
 def profile_view(request):
     albums = Album.objects.filter(owner=request.user).prefetch_related('photos')
     form = AlbumForm(user=request.user)
-    photo_form = PhotoForm()  # Initialize the photo form
-    photo_form.fields['album'].queryset = albums  # Limit album choices to user's own albums
+    photo_form = PhotoForm()  
+    photo_form.fields['album'].queryset = albums  
 
     if request.method == 'POST':
         if 'create_album' in request.POST:
@@ -54,25 +54,27 @@ def profile_view(request):
             if photo_form.is_valid():
                 photo = photo_form.save(commit=False)
                 photo.album_id = request.POST.get('album') 
-                photo.save()  # Save the photo to generate an ID
+                photo.save()  
 
                 # Handle tags
                 tag_list = request.POST.get('tags', '').split(',')
                 for tag_name in tag_list:
                     tag_name = tag_name.strip()
-                    if tag_name:  # Ensure tag is not empty
+                    if tag_name:  
                         tag, created = Tag.objects.get_or_create(name=tag_name)
                         photo.tags.add(tag)
 
-                photo.save()  # Save the photo again to link tags
+                photo.save()  
                 return redirect('accounts:profile')
 
     return render(request, 'accounts/profile.html', {'form': form, 'photo_form': photo_form, 'albums': albums})
 
 @login_required
 def delete_album(request, album_id):
-    album = get_object_or_404(Album, id=album_id, owner=request.user)  # Ensure the user owns the album
+    album = get_object_or_404(Album, id=album_id, owner=request.user) 
     if request.method == 'POST':
         album.delete()
-        return redirect('accounts:profile')  # Redirect to the profile page or wherever appropriate
+        return redirect('accounts:profile')  
     return redirect('accounts:album_detail', album_id=album_id)
+
+

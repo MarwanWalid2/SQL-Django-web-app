@@ -34,7 +34,6 @@ class CommentForm(forms.ModelForm):
         comment = super().save(commit=False)
         if self.user and self.user.is_authenticated:
             comment.user = self.user
-        # Otherwise, the user will remain None and be treated as 'Guest' in display
         if commit:
             comment.save()
         return comment
@@ -42,7 +41,7 @@ class CommentForm(forms.ModelForm):
 class AlbumForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields = ['name']  # Add more fields if necessary
+        fields = ['name'] 
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -50,7 +49,7 @@ class AlbumForm(forms.ModelForm):
 
     def save(self, commit=True):
         album = super().save(commit=False)
-        if not self.instance.pk:  # If no instance, it's a new album
+        if not self.instance.pk:
             album.owner = self.user
         if commit:
             album.save()

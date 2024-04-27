@@ -57,14 +57,52 @@ def home_view(request):
 
 
 User = get_user_model()
-@login_required
-# views.py
 
+
+
+
+def get_friend_recommendations(user):
+    friends = set()
+    friends_relations = Friend.objects.filter(Q(user1=user) | Q(user2=user))
+    for relation in friends_relations:
+        if relation.user1 == user:
+            friends.add(relation.user2)
+        else:
+            friends.add(relation.user1)
+
+    friends_of_friends = set()
+    for friend in friends:
+        fof_relations = Friend.objects.filter(Q(user1=friend) | Q(user2=friend)).exclude(user1=user).exclude(user2=user)
+        for fof in fof_relations:
+            if fof.user1 != user and fof.user1 not in friends:
+                friends_of_friends.add(fof.user1)
+            if fof.user2 != user and fof.user2 not in friends:
+                friends_of_friends.add(fof.user2)
+
+    recommendations = sorted(
+        friends_of_friends, 
+        key=lambda x: (
+            len(
+                friends.intersection(
+                    set(
+                        User.objects.get(pk=uid) for uid_tuple in Friend.objects.filter(Q(user1=x) | Q(user2=x)).values_list('user1_id', 'user2_id') for uid in uid_tuple if uid != x.id
+                    )
+                )
+            ), 
+            -x.id
+        ),
+        reverse=True
+    )
+    return recommendations
+
+
+@login_required
 def friends_view(request):
     form = UserSearchForm(request.GET or None)
     search_results = []
     friends = set()
-
+    recommendations = get_friend_recommendations(request.user)
+    # print(recommendations)
     # Get the current user's friends
     friends_relations = Friend.objects.filter(Q(user1=request.user) | Q(user2=request.user))
     friend_ids = {relation.user2.id if relation.user1 == request.user else relation.user1.id for relation in friends_relations}
@@ -88,7 +126,8 @@ def friends_view(request):
     return render(request, 'friends.html', {
         'form': form,
         'search_results': search_results,
-        'friends': friends
+        'friends': friends,
+        'recommendations': recommendations
     })
 
 
